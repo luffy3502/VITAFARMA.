@@ -3,24 +3,35 @@
 import Image from "next/image";
 import { motion, useInView, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
 import {
+  Activity,
   ArrowRight,
   Baby,
   BadgeCheck,
+  BookOpen,
+  ChevronRight,
   ChevronUp,
   Clock,
+  CreditCard,
+  Droplet,
   HeartHandshake,
   Instagram,
+  Mail,
   MapPin,
   Menu,
   MessageCircle,
   PackageCheck,
+  Phone,
   Pill,
+  Quote,
+  Search,
   ShieldCheck,
   Sparkles,
   Star,
   Stethoscope,
   Sun,
+  Syringe,
   Truck,
+  Users,
   X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -33,8 +44,30 @@ const nav = [
   ["Sobre", "#sobre"],
   ["Produtos", "#produtos"],
   ["Ofertas", "#ofertas"],
+  ["Serviços", "#servicos"],
   ["Diferenciais", "#diferenciais"],
   ["Contato", "#contato"],
+] as const;
+
+const heroHighlights = [
+  ["Produtos Originais", ShieldCheck],
+  ["Entrega Rápida", Truck],
+  ["Atendimento Humanizado", HeartHandshake],
+  ["Farmacêuticos Qualificados", BadgeCheck],
+] as const;
+
+const premiumCare = [
+  ["Atendimento Humanizado", "Aqui você é nossa prioridade", HeartHandshake],
+  ["Entrega Rápida", "Agilidade e segurança na entrega", Truck],
+  ["Farmacêutico Qualificado", "Orientação e cuidado especializado", Stethoscope],
+  ["Produtos de Qualidade", "As melhores marcas para você", BadgeCheck],
+] as const;
+
+const heroBenefits = [
+  ["Medicamentos éticos e genéricos", Pill],
+  ["Perfumaria das melhores marcas", Sparkles],
+  ["Vitaminas e suplementos", PackageCheck],
+  ["Cuidados diários para toda família", ShieldCheck],
 ] as const;
 
 const productCategories = [
@@ -111,6 +144,49 @@ const testimonials = [
   },
 ];
 
+const brandLogos = ["Eurofarma", "EMS", "NIVEA", "P&G", "Johnson&Johnson", "CIMED", "La Roche-Posay", "VICHY"];
+
+const pharmacyServices = [
+  ["Aferição de Pressão", Activity],
+  ["Aplicação de Injetáveis", Syringe],
+  ["Teste de Glicemia", Droplet],
+  ["Orientação Farmacêutica", Stethoscope],
+  ["Perfuração de Lóbulo", BadgeCheck],
+] as const;
+
+const convenioItems = ["Farmácia Popular", "hapvida", "Bradesco Saúde", "SulAmérica"];
+
+const healthTips = [
+  {
+    title: "Como manter a imunidade alta no dia a dia",
+    image: "https://images.unsplash.com/photo-1628771065518-0d82f1938462?auto=format&fit=crop&w=360&q=82",
+  },
+  {
+    title: "A importância da hidratação para o corpo",
+    image: "https://images.unsplash.com/photo-1523362628745-0c100150b504?auto=format&fit=crop&w=360&q=82",
+  },
+  {
+    title: "Vitaminas: quando e por que suplementar?",
+    image: "https://images.unsplash.com/photo-1471864190281-a93a3070b6de?auto=format&fit=crop&w=360&q=82",
+  },
+];
+
+const visualOffers = [
+  ...ofertasSemana.map((item, index) => ({ ...item, desconto: ["-20%", "-15%", "-18%"][index] ?? "-12%" })),
+  {
+    id: 99,
+    nome: "Shampoo Pantene 400ml",
+    categoria: "Perfumaria",
+    descricao: "Cuidado diário para cabelos com brilho, maciez e proteção.",
+    imagem: "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&w=700&q=82",
+    precoAntigo: "R$ 28,90",
+    precoAtual: "R$ 22,54",
+    selo: "Oferta" as const,
+    mensagemWhatsApp: "Olá, VitaFarma! Tenho interesse no Shampoo Pantene 400ml.",
+    desconto: "-22%",
+  },
+];
+
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
   visible: { opacity: 1, y: 0 },
@@ -136,9 +212,9 @@ function SectionIntro({
       transition={{ duration: 0.65 }}
       className={align === "center" ? "mx-auto max-w-3xl text-center" : "max-w-2xl"}
     >
-      <span className="font-display text-sm font-bold uppercase tracking-[0.22em] text-royal">{eyebrow}</span>
-      <h2 className="mt-4 font-display text-3xl font-bold leading-tight text-midnight md:text-5xl">{title}</h2>
-      <p className="mt-5 text-base leading-8 text-slate-600 md:text-lg">{text}</p>
+      <span className="font-display text-xs font-extrabold uppercase tracking-[0.16em] text-signal">{eyebrow}</span>
+      <h2 className="mt-3 font-display text-3xl font-extrabold leading-tight text-midnight md:text-4xl">{title}</h2>
+      <p className="mt-4 text-sm leading-7 text-slate-600 md:text-base">{text}</p>
     </motion.div>
   );
 }
@@ -147,59 +223,85 @@ function Header() {
   const [open, setOpen] = useState(false);
   const { scrollY } = useScroll();
   const compact = useTransform(scrollY, [0, 80], [0, 1]);
-  const bg = useTransform(compact, [0, 1], ["rgba(255,255,255,0)", "rgba(255,255,255,0.78)"]);
-  const height = useTransform(compact, [0, 1], [88, 72]);
+  const navHeight = useTransform(compact, [0, 1], [92, 76]);
   const logoScale = useTransform(compact, [0, 1], [1, 0.86]);
+  const shadow = useTransform(compact, [0, 1], ["0 12px 40px rgba(6,23,47,0.04)", "0 18px 52px rgba(6,23,47,0.14)"]);
 
   return (
-    <motion.header
-      style={{ backgroundColor: bg, height }}
-      className="fixed inset-x-0 top-0 z-50 border-b border-white/10 backdrop-blur-xl"
-    >
-      <div className="container-shell flex h-full items-center justify-between gap-5">
-        <a href="#inicio" className="flex items-center gap-3" aria-label="VitaFarma Antas">
-          <motion.div style={{ scale: logoScale }}>
-            <Image src="/logo-vitafarma.png" alt="VitaFarma Antas" width={150} height={78} priority className="h-auto w-32 md:w-40" />
-          </motion.div>
-        </a>
-
-        <nav className="hidden items-center gap-7 rounded-full border border-white/35 bg-white/40 px-6 py-3 text-sm font-semibold text-midnight/80 shadow-sm backdrop-blur-xl lg:flex">
-          {nav.map(([label, href]) => (
-            <a key={label} href={href} className="transition hover:text-royal">
-              {label}
+    <header className="fixed inset-x-0 top-0 z-[70]">
+      <div className="bg-midnight text-white">
+        <div className="container-shell flex min-h-11 items-center justify-center gap-4 text-xs font-semibold sm:justify-between md:text-sm">
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+            <span className="inline-flex items-center gap-2">
+              <MapPin size={16} className="text-signal" />
+              Antas - Bahia
+            </span>
+            <span className="hidden h-4 w-px bg-white/18 sm:block" />
+            <span className="inline-flex items-center gap-2">
+              <Clock size={16} className="text-signal" />
+              Seg - Sáb: 07h às 21h
+            </span>
+            <span className="hidden h-4 w-px bg-white/18 lg:block" />
+            <span className="hidden items-center gap-2 lg:inline-flex">
+              <Truck size={16} className="text-signal" />
+              Entrega rápida para Antas e região
+            </span>
+          </div>
+          <div className="hidden items-center gap-4 lg:flex">
+            <span className="h-4 w-px bg-white/18" />
+            <a href={site.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-signal transition hover:text-white">
+              <Instagram size={17} />
             </a>
-          ))}
-        </nav>
-
-        <a
-          href={whatsappLink("Olá, VitaFarma Antas! Quero fazer um pedido.")}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="shine hidden items-center gap-2 rounded-full bg-signal px-5 py-3 text-sm font-bold text-white shadow-lift transition hover:-translate-y-0.5 lg:flex"
-        >
-          <MessageCircle size={18} />
-          Pedir pelo WhatsApp
-        </a>
-
-        <button
-          type="button"
-          aria-label="Abrir menu"
-          onClick={() => setOpen(true)}
-          className="grid h-11 w-11 place-items-center rounded-full bg-white/80 text-midnight shadow-lift lg:hidden"
-        >
-          <Menu size={22} />
-        </button>
+            <a href={whatsappLink("Olá, VitaFarma Antas! Quero atendimento.")} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="text-signal transition hover:text-white">
+              <MessageCircle size={18} />
+            </a>
+          </div>
+        </div>
       </div>
 
+      <motion.div style={{ height: navHeight, boxShadow: shadow }} className="overflow-hidden bg-white/96 backdrop-blur-xl">
+        <div className="container-shell flex h-full items-center justify-between gap-5">
+          <a href="#inicio" className="flex items-center gap-3" aria-label="VitaFarma Antas">
+            <motion.div style={{ scale: logoScale }} className="origin-left">
+              <Image src="/logo-vitafarma.png" alt="VitaFarma Antas" width={210} height={110} priority className="h-16 w-auto object-contain md:h-20" />
+            </motion.div>
+          </a>
+
+          <nav className="hidden items-center gap-8 text-[15px] font-bold text-midnight/78 xl:flex">
+            {nav.map(([label, href], index) => (
+              <a key={label} href={href} className={`relative py-3 transition hover:text-royal ${index === 0 ? "text-royal" : ""}`}>
+                {label}
+                {index === 0 ? <span className="absolute inset-x-0 -bottom-0.5 mx-auto h-0.5 w-9 rounded-full bg-royal" /> : null}
+              </a>
+            ))}
+          </nav>
+
+          <a
+            href={whatsappLink("Olá, VitaFarma Antas! Quero fazer um pedido.")}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shine hidden items-center gap-2 rounded-full bg-signal px-7 py-4 text-sm font-extrabold text-white shadow-[0_16px_36px_rgba(229,47,63,0.28)] transition hover:-translate-y-0.5 lg:flex"
+          >
+            <MessageCircle size={19} />
+            Peça pelo WhatsApp
+          </a>
+
+          <button
+            type="button"
+            aria-label="Abrir menu"
+            onClick={() => setOpen(true)}
+            className="grid h-11 w-11 place-items-center rounded-full bg-ice text-midnight shadow-lift xl:hidden"
+          >
+            <Menu size={22} />
+          </button>
+        </div>
+      </motion.div>
+
       {open ? (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed inset-0 z-50 bg-midnight/70 p-4 backdrop-blur-md lg:hidden"
-        >
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-50 bg-midnight/70 p-4 backdrop-blur-md xl:hidden">
           <motion.div initial={{ x: 80 }} animate={{ x: 0 }} className="ml-auto flex h-full max-w-sm flex-col rounded-[8px] bg-white p-6 shadow-glow">
             <div className="flex items-center justify-between">
-              <Image src="/logo-vitafarma.png" alt="VitaFarma Antas" width={130} height={68} className="h-auto w-32" />
+              <Image src="/logo-vitafarma.png" alt="VitaFarma Antas" width={150} height={78} className="h-auto w-36" />
               <button type="button" aria-label="Fechar menu" onClick={() => setOpen(false)} className="grid h-10 w-10 place-items-center rounded-full bg-ice">
                 <X size={21} />
               </button>
@@ -218,12 +320,12 @@ function Header() {
               className="shine mt-auto flex items-center justify-center gap-2 rounded-full bg-signal px-5 py-4 font-bold text-white"
             >
               <MessageCircle size={20} />
-              Pedir pelo WhatsApp
+              Peça pelo WhatsApp
             </a>
           </motion.div>
         </motion.div>
       ) : null}
-    </motion.header>
+    </header>
   );
 }
 
@@ -297,71 +399,134 @@ function Counter({ value, suffix = "", label }: { value: number; suffix?: string
 
 function Hero() {
   const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 600], [0, 90]);
+  const bgY = useTransform(scrollY, [0, 650], [0, 76]);
 
   return (
-    <section id="inicio" className="relative min-h-[92vh] overflow-hidden bg-midnight pt-28 text-white">
-      <motion.div style={{ y }} className="absolute inset-0">
+    <section id="inicio" className="relative isolate overflow-hidden bg-ice pt-[136px] text-midnight lg:pt-[136px]">
+      <motion.div style={{ y: bgY }} className="absolute inset-0 z-0">
         <Image
-          src="https://images.unsplash.com/photo-1576602976047-174e57a47881?auto=format&fit=crop&w=2200&q=86"
-          alt="Atendimento farmacêutico moderno"
+          src="https://images.unsplash.com/photo-1576602976047-174e57a47881?auto=format&fit=crop&w=2400&q=88"
+          alt="Farmácia moderna VitaFarma"
           fill
           priority
           sizes="100vw"
-          className="object-cover"
+          className="scale-105 object-cover blur-[2px]"
         />
       </motion.div>
-      <div className="absolute inset-0 bg-[linear-gradient(110deg,rgba(6,23,47,0.95),rgba(6,23,47,0.72)_44%,rgba(21,88,214,0.24))]" />
-      <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-ice to-transparent" />
+      <div className="absolute inset-0 z-[1] bg-white/72" />
+      <div className="absolute inset-0 z-[2] bg-[radial-gradient(circle_at_48%_44%,rgba(255,255,255,0.28),transparent_30%),linear-gradient(90deg,rgba(255,255,255,0.94)_0%,rgba(255,255,255,0.74)_45%,rgba(255,255,255,0.88)_100%)]" />
+      <div className="absolute inset-x-0 bottom-0 z-[3] h-40 bg-gradient-to-t from-ice via-white/60 to-transparent" />
 
-      <div className="container-shell relative z-10 grid min-h-[calc(92vh-112px)] items-center gap-12 py-14 lg:grid-cols-[1fr_430px]">
-        <motion.div initial="hidden" animate="visible" transition={{ staggerChildren: 0.12 }}>
-          <motion.span variants={fadeUp} className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/12 px-4 py-2 text-sm font-bold backdrop-blur-xl">
-            <Sparkles size={16} className="text-cyan" />
+      <div className="container-shell relative z-10 grid min-h-[680px] items-center gap-8 py-7 lg:grid-cols-[1.02fr_0.86fr] xl:grid-cols-[0.98fr_0.58fr_0.82fr] xl:gap-5">
+        <motion.div initial="hidden" animate="visible" transition={{ staggerChildren: 0.1 }} className="min-w-0 max-w-[620px] xl:pb-8">
+          <motion.span variants={fadeUp} className="inline-flex items-center gap-2 rounded-full bg-royal px-4 py-2 text-sm font-extrabold text-white shadow-[0_16px_34px_rgba(21,88,214,0.25)]">
+            <MapPin size={17} />
             VitaFarma Antas
           </motion.span>
-          <motion.h1 variants={fadeUp} className="mt-6 max-w-4xl font-display text-4xl font-extrabold leading-[1.06] text-balance md:text-6xl">
-            Mais saúde, cuidado e praticidade para você todos os dias.
+
+          <motion.h1 variants={fadeUp} className="mt-4 max-w-full font-display text-[clamp(2rem,9vw,4.15rem)] font-extrabold leading-[0.98] text-midnight [overflow-wrap:anywhere]">
+            <span className="block">Mais <span className="text-royal">Saúde</span>,</span>
+            <span className="block">cuidado e</span>
+            <span className="block"><span className="text-signal">Praticidade</span></span>
+            <span className="block">para</span>
+            <span className="block">você todos os</span>
+            <span className="block">dias.</span>
           </motion.h1>
-          <motion.p variants={fadeUp} className="mt-6 max-w-2xl text-lg leading-8 text-white/78 md:text-xl">
-            Medicamentos, perfumaria, vitaminas e atendimento humanizado em Antas.
+
+          <motion.p variants={fadeUp} className="mt-5 max-w-full text-base font-medium leading-7 text-slate-600 md:max-w-2xl md:text-lg">
+            Medicamentos, perfumaria, vitaminas e atendimento humanizado em Antas com a agilidade que sua rotina precisa.
           </motion.p>
-          <motion.div variants={fadeUp} className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <a href={whatsappLink("Olá, VitaFarma Antas! Quero fazer um pedido.")} target="_blank" rel="noopener noreferrer" className="shine inline-flex items-center justify-center gap-2 rounded-full bg-signal px-7 py-4 font-bold text-white shadow-glow transition hover:-translate-y-1">
-              <MessageCircle size={20} />
-              Pedir pelo WhatsApp
+
+          <motion.div variants={fadeUp} className="mt-6 grid max-w-xl grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-4">
+            {heroHighlights.map(([label, Icon]) => (
+              <motion.div key={label} whileHover={{ y: -5 }} className="flex min-h-[66px] items-center gap-3 rounded-[8px] border border-white bg-white/82 p-3 shadow-[0_16px_34px_rgba(6,23,47,0.1)] backdrop-blur-xl">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[8px] bg-white text-royal shadow-sm ring-1 ring-royal/10">
+                  <Icon size={20} />
+                </span>
+                <span className="text-xs font-extrabold leading-tight text-midnight sm:text-[13px]">{label}</span>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          <motion.div variants={fadeUp} className="mt-6 flex flex-col gap-4 sm:flex-row">
+            <a href={whatsappLink("Olá, VitaFarma Antas! Quero fazer um pedido.")} target="_blank" rel="noopener noreferrer" className="shine inline-flex w-full items-center justify-center gap-3 rounded-full bg-signal px-6 py-4 text-sm font-extrabold text-white shadow-[0_22px_44px_rgba(229,47,63,0.28)] transition hover:-translate-y-1 sm:w-auto sm:px-8 sm:text-base">
+              <MessageCircle size={23} />
+              Peça pelo WhatsApp
+              <ChevronRight size={20} />
             </a>
-            <a href="#ofertas" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/24 bg-white/12 px-7 py-4 font-bold text-white backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white/20">
+            <a href="#ofertas" className="inline-flex w-full items-center justify-center gap-3 rounded-full border border-white bg-white/86 px-6 py-4 text-sm font-extrabold text-midnight shadow-[0_18px_38px_rgba(6,23,47,0.1)] backdrop-blur-xl transition hover:-translate-y-1 hover:text-royal sm:w-auto sm:px-8 sm:text-base">
+              <Search size={22} className="text-royal" />
               Ver Ofertas
-              <ArrowRight size={19} />
+              <ChevronRight size={20} />
             </a>
           </motion.div>
         </motion.div>
 
-        <motion.aside initial={{ opacity: 0, x: 60, scale: 0.95 }} animate={{ opacity: 1, x: 0, scale: 1 }} transition={{ duration: 0.75, delay: 0.25 }} className="glass rounded-[8px] p-5 text-midnight">
-          <div className="flex items-center gap-4 border-b border-slate-200/80 pb-5">
-            <Image src="/logo-vitafarma.png" alt="VitaFarma Antas" width={120} height={64} className="h-auto w-28" />
-            <div>
-              <strong className="font-display text-lg">Atendimento premium</strong>
-              <p className="text-sm text-slate-600">Pedido rápido pelo WhatsApp</p>
+        <motion.div
+          initial={{ opacity: 0, y: 34, scale: 0.96 }}
+          animate={{ opacity: 1, y: [0, -12, 0], scale: 1 }}
+          transition={{ opacity: { duration: 0.7, delay: 0.18 }, scale: { duration: 0.7, delay: 0.18 }, y: { duration: 5.4, repeat: Infinity, ease: "easeInOut" } }}
+          className="relative mx-auto hidden min-h-[570px] w-full max-w-[360px] self-end xl:block"
+        >
+          <div className="absolute inset-x-8 bottom-4 h-24 rounded-full bg-royal/16 blur-2xl" />
+          <Image
+            src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&w=920&q=88"
+            alt="Farmacêutica sorrindo"
+            fill
+            priority
+            sizes="30vw"
+            className="object-cover object-[50%_12%]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-ice via-transparent to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white/35 to-transparent" />
+        </motion.div>
+
+        <motion.aside initial={{ opacity: 0, x: 44, scale: 0.96 }} animate={{ opacity: 1, x: 0, scale: 1 }} transition={{ duration: 0.75, delay: 0.28 }} className="min-w-0 max-w-full overflow-hidden rounded-[8px] border border-white/70 bg-white/72 text-midnight shadow-[0_28px_74px_rgba(6,23,47,0.22)] backdrop-blur-2xl lg:col-span-2 xl:col-span-1">
+          <div className="relative overflow-hidden bg-midnight px-7 pb-11 pt-7 text-white">
+            <div className="absolute inset-x-0 bottom-[-32px] h-20 rounded-[50%] bg-white/90" />
+            <div className="relative flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-5">
+              <span className="grid h-20 w-20 shrink-0 place-items-center rounded-full bg-royal text-white shadow-[0_18px_40px_rgba(21,88,214,0.34)]">
+                <MessageCircle size={40} />
+              </span>
+              <div className="min-w-0">
+                <h2 className="font-display text-xl font-extrabold leading-tight sm:text-2xl">Atendimento Premium</h2>
+                <p className="mt-2 text-base leading-7 text-white/84 sm:text-lg">Rápido, fácil e humanizado pelo WhatsApp</p>
+              </div>
             </div>
           </div>
-          <div className="grid gap-3 py-5">
-            {benefits.slice(0, 4).map(([label, Icon]) => (
-              <div key={label} className="flex items-center gap-3 rounded-[8px] bg-white/80 p-3">
-                <span className="grid h-10 w-10 place-items-center rounded-full bg-cyan/12 text-royal">
-                  <Icon size={20} />
+
+          <div className="grid gap-3 px-5 pb-5 pt-7">
+            {premiumCare.map(([title, text, Icon]) => (
+              <motion.div key={title} whileHover={{ x: 4 }} className="flex items-center gap-4 rounded-[8px] bg-white p-4 shadow-[0_14px_30px_rgba(6,23,47,0.08)] ring-1 ring-slate-100">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-royal/10 text-royal">
+                  <Icon size={24} />
                 </span>
-                <span className="font-semibold">{label}</span>
-              </div>
+                <div className="min-w-0 flex-1">
+                  <strong className="block font-display text-base font-extrabold text-midnight">{title}</strong>
+                  <span className="mt-1 block text-sm font-medium text-slate-500">{text}</span>
+                </div>
+                <ChevronRight size={20} className="text-midnight/46" />
+              </motion.div>
             ))}
           </div>
-          <div className="grid grid-cols-3 gap-2 text-center">
-            {["8k+ clientes", "3.5k entregas", "5 estrelas"].map((item) => (
-              <div key={item} className="rounded-[8px] bg-midnight px-2 py-3 text-xs font-bold uppercase tracking-wide text-white">
-                {item}
-              </div>
-            ))}
+
+          <div className="mx-5 mb-5 grid grid-cols-3 rounded-[8px] bg-midnight px-3 py-4 text-white shadow-[0_18px_36px_rgba(6,23,47,0.22)]">
+            {[
+              ["8K+", "Clientes", HeartHandshake],
+              ["3.5K+", "Entregas", Truck],
+              ["5", "Avaliações", Star],
+            ].map(([value, label, Icon], index) => {
+              const TypedIcon = Icon as LucideIcon;
+              return (
+                <div key={String(label)} className={`flex items-center justify-center gap-2 px-2 text-center ${index > 0 ? "border-l border-white/16" : ""}`}>
+                  <TypedIcon size={24} className="hidden text-white/58 sm:block" />
+                  <div>
+                    <strong className="block font-display text-lg font-extrabold leading-none">{String(value)}</strong>
+                    <span className="mt-1 block text-[11px] font-bold text-white/82">{String(label)}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </motion.aside>
       </div>
@@ -371,50 +536,15 @@ function Hero() {
 
 function BenefitsBar() {
   return (
-    <section aria-label="Benefícios" className="relative z-20 -mt-8">
-      <div className="container-shell glass grid gap-3 rounded-[8px] p-4 md:grid-cols-5">
-        {benefits.map(([label, Icon], index) => (
-          <motion.div key={label} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ delay: index * 0.06 }} className="flex items-center gap-3 rounded-[8px] bg-white/72 p-4">
-            <Icon className="shrink-0 text-royal" size={21} />
-            <span className="text-sm font-bold text-midnight">{label}</span>
-          </motion.div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function About() {
-  return (
-    <section id="sobre" className="bg-ice py-24">
-      <div className="container-shell grid items-center gap-12 lg:grid-cols-[0.92fr_1.08fr]">
-        <motion.div initial={{ opacity: 0, x: -48 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }} className="relative min-h-[520px] overflow-hidden rounded-[8px] shadow-glow">
-          <Image src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=84" alt="Cuidado farmacêutico humanizado" fill sizes="(max-width: 1024px) 100vw, 46vw" className="object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-midnight/70 via-transparent to-transparent" />
-          <div className="absolute bottom-6 left-6 right-6 rounded-[8px] border border-white/20 bg-white/18 p-5 text-white backdrop-blur-xl">
-            <strong className="font-display text-2xl">Antas, Bahia</strong>
-            <p className="mt-2 text-white/78">{site.address}</p>
-          </div>
-        </motion.div>
-
-        <div>
-          <SectionIntro
-            eyebrow="Sobre"
-            title="Uma farmácia pensada para simplificar sua rotina."
-            text={site.description}
-          />
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
-            {[
-              ["Cuidado", "Atendimento próximo para orientar com responsabilidade."],
-              ["Tecnologia", "Pedido por WhatsApp com resposta ágil e objetiva."],
-              ["Confiança", "Produtos selecionados para cuidar melhor de você."],
-            ].map(([title, text], index) => (
-              <motion.div key={title} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ delay: index * 0.08 }} className="rounded-[8px] border border-slate-200 bg-white p-5 shadow-sm">
-                <h3 className="font-display text-lg font-bold">{title}</h3>
-                <p className="mt-3 text-sm leading-6 text-slate-600">{text}</p>
-              </motion.div>
-            ))}
-          </div>
+    <section aria-label="Benefícios" className="relative z-20 -mt-6 bg-ice pb-12 md:-mt-8">
+      <div className="container-shell rounded-[8px] border border-white bg-white/94 px-5 py-4 shadow-[0_20px_54px_rgba(6,23,47,0.12)] backdrop-blur-xl">
+        <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4">
+          {heroBenefits.map(([label, Icon], index) => (
+            <motion.div key={label} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ delay: index * 0.06 }} whileHover={{ y: -4 }} className={`flex items-center justify-center gap-3 px-3 py-3 text-center ${index > 0 ? "lg:border-l lg:border-slate-200" : ""}`}>
+              <Icon className="shrink-0 text-royal" size={22} />
+              <span className="text-sm font-extrabold text-midnight">{label}</span>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
@@ -424,20 +554,16 @@ function About() {
 function ProductCard({ item, index }: { item: (typeof productCategories)[number]; index: number }) {
   const Icon = item.icon;
   return (
-    <motion.article variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-70px" }} transition={{ delay: index * 0.07 }} whileHover={{ y: -8 }} className="group overflow-hidden rounded-[8px] bg-white shadow-lift">
-      <div className="relative aspect-[1.35] overflow-hidden">
+    <motion.article variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-70px" }} transition={{ delay: index * 0.07 }} whileHover={{ y: -8 }} className="group overflow-hidden rounded-[8px] border border-slate-200 bg-white shadow-[0_18px_45px_rgba(6,23,47,0.08)]">
+      <div className="relative aspect-[1.18] overflow-hidden bg-ice">
         <Image src={item.image} alt={item.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition duration-700 group-hover:scale-105" />
-        <div className="absolute left-4 top-4 grid h-12 w-12 place-items-center rounded-full bg-white/88 text-royal shadow-sm backdrop-blur-xl">
+        <div className="absolute left-4 top-4 grid h-11 w-11 place-items-center rounded-[8px] bg-white/90 text-royal shadow-sm backdrop-blur-xl">
           <Icon size={23} />
         </div>
       </div>
-      <div className="p-6">
-        <h3 className="font-display text-xl font-bold text-midnight">{item.title}</h3>
-        <p className="mt-3 min-h-[72px] text-sm leading-6 text-slate-600">{item.description}</p>
-        <a href={whatsappLink(`Olá, VitaFarma! Quero solicitar produtos da categoria ${item.title}.`)} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex items-center gap-2 font-bold text-royal transition group-hover:text-signal">
-          Solicitar pelo WhatsApp
-          <ArrowRight size={17} />
-        </a>
+      <div className="p-5 text-center">
+        <h3 className="font-display text-lg font-extrabold text-midnight">{item.title}</h3>
+        <p className="mt-2 text-xs leading-5 text-slate-500">{item.description}</p>
       </div>
     </motion.article>
   );
@@ -445,11 +571,19 @@ function ProductCard({ item, index }: { item: (typeof productCategories)[number]
 
 function Products() {
   return (
-    <section id="produtos" className="bg-white py-24">
-      <div className="container-shell">
-        <SectionIntro eyebrow="Produtos" title="Vitrine premium para o cuidado de todos os dias." text="Categorias essenciais para sua saúde, beleza, bem-estar e conveniência, com atendimento direto pelo WhatsApp." align="center" />
-        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {productCategories.map((item, index) => (
+    <section id="servicos" className="bg-white py-16">
+      <span id="sobre" className="block scroll-mt-40" />
+      <span id="produtos" className="block scroll-mt-40" />
+      <div className="container-shell grid items-center gap-10 lg:grid-cols-[0.88fr_1.5fr]">
+        <div>
+          <SectionIntro eyebrow="Nossos serviços" title="Tudo que você precisa para viver mais e melhor" text="Oferecemos muito mais do que medicamentos. Aqui você encontra serviços e produtos de qualidade para cuidar da sua saúde e bem-estar." />
+          <a href={whatsappLink("Olá, VitaFarma! Quero conhecer os serviços disponíveis.")} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 rounded-full bg-royal px-6 py-3 text-sm font-extrabold text-white shadow-lift transition hover:-translate-y-1">
+            Conheça nossos serviços
+            <ChevronRight size={17} />
+          </a>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {productCategories.slice(0, 4).map((item, index) => (
             <ProductCard key={item.title} item={item} index={index} />
           ))}
         </div>
@@ -460,34 +594,31 @@ function Products() {
 
 function Offers() {
   return (
-    <section id="ofertas" className="soft-grid bg-ice py-24">
-      <div className="container-shell">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <SectionIntro eyebrow="Ofertas da semana" title="Promoções atualizadas para pedir em poucos cliques." text="A seção é renderizada a partir do arquivo de ofertas. Basta atualizar o array para trocar os produtos da semana." />
-          <a href={whatsappLink("Olá, VitaFarma! Quero ver todas as ofertas disponíveis.")} target="_blank" rel="noopener noreferrer" className="shine inline-flex w-fit items-center gap-2 rounded-full bg-midnight px-6 py-4 font-bold text-white shadow-lift">
+    <section id="ofertas" className="bg-ice py-16">
+      <div className="container-shell grid gap-8 lg:grid-cols-[0.42fr_1fr]">
+        <div className="self-center">
+          <SectionIntro eyebrow="Ofertas da semana" title="Economize com nossas ofertas" text="Produtos selecionados com preços especiais para você economizar mais todos os dias." />
+          <a href={whatsappLink("Olá, VitaFarma! Quero ver todas as ofertas disponíveis.")} target="_blank" rel="noopener noreferrer" className="shine mt-6 inline-flex items-center gap-2 rounded-full bg-signal px-6 py-3 text-sm font-extrabold text-white shadow-[0_18px_36px_rgba(229,47,63,0.22)]">
             Ver todas as ofertas
-            <ArrowRight size={19} />
+            <ChevronRight size={17} />
           </a>
         </div>
-
-        <div className="mt-12 grid gap-5 lg:grid-cols-3">
-          {ofertasSemana.map((oferta, index) => (
-            <motion.article key={oferta.id} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ delay: index * 0.09 }} whileHover={{ y: -8 }} className="group overflow-hidden rounded-[8px] bg-white shadow-lift">
-              <div className="relative aspect-[1.22] overflow-hidden">
-                <Image src={oferta.imagem} alt={oferta.nome} fill sizes="(max-width: 1024px) 100vw, 33vw" className="object-cover transition duration-700 group-hover:scale-105" />
-                <span className="absolute left-4 top-4 rounded-full bg-signal px-4 py-2 text-xs font-extrabold uppercase tracking-[0.16em] text-white">{oferta.selo}</span>
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {visualOffers.map((oferta, index) => (
+            <motion.article key={oferta.id} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ delay: index * 0.06 }} whileHover={{ y: -8 }} className="group relative overflow-hidden rounded-[8px] border border-slate-200 bg-white p-4 shadow-[0_18px_45px_rgba(6,23,47,0.08)]">
+              <span className="absolute left-4 top-4 z-10 rounded-full bg-signal px-3 py-1.5 text-xs font-extrabold text-white">{oferta.desconto}</span>
+              <div className="relative mx-auto aspect-[1.25] w-full overflow-hidden rounded-[8px] bg-ice">
+                <Image src={oferta.imagem} alt={oferta.nome} fill sizes="(max-width: 1024px) 50vw, 20vw" className="object-cover transition duration-700 group-hover:scale-105" />
               </div>
-              <div className="p-6">
-                <span className="text-sm font-bold uppercase tracking-[0.18em] text-royal">{oferta.categoria}</span>
-                <h3 className="mt-3 font-display text-2xl font-bold">{oferta.nome}</h3>
-                <p className="mt-3 min-h-[72px] text-sm leading-6 text-slate-600">{oferta.descricao}</p>
-                <div className="mt-5 flex items-end gap-3">
+              <div className="pt-4">
+                <h3 className="min-h-[44px] font-display text-base font-extrabold leading-tight text-midnight">{oferta.nome}</h3>
+                <div className="mt-3 flex items-end gap-2">
                   <span className="text-sm font-semibold text-slate-400 line-through">{oferta.precoAntigo}</span>
-                  <strong className="font-display text-3xl font-extrabold text-signal">{oferta.precoAtual}</strong>
+                  <strong className="font-display text-2xl font-extrabold text-royal">{oferta.precoAtual}</strong>
                 </div>
-                <a href={whatsappLink(oferta.mensagemWhatsApp)} target="_blank" rel="noopener noreferrer" className="shine mt-6 flex items-center justify-center gap-2 rounded-full bg-signal px-5 py-4 font-bold text-white">
-                  <MessageCircle size={19} />
-                  Pedir pelo WhatsApp
+                <a href={whatsappLink(oferta.mensagemWhatsApp)} target="_blank" rel="noopener noreferrer" className="shine mt-4 flex items-center justify-center gap-2 rounded-[8px] bg-royal px-4 py-3 text-sm font-bold text-white">
+                  <MessageCircle size={17} />
+                  Pedir
                 </a>
               </div>
             </motion.article>
@@ -500,17 +631,17 @@ function Offers() {
 
 function Differentials() {
   return (
-    <section id="diferenciais" className="bg-midnight py-24 text-white">
-      <div className="container-shell">
-        <SectionIntro eyebrow="Diferenciais" title="Um atendimento que combina cuidado humano e agilidade." text="A experiência foi desenhada para transmitir segurança desde o primeiro contato até a confirmação do pedido." align="center" />
-        <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {differentials.map(([title, text, Icon], index) => (
-            <motion.div key={title} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ delay: index * 0.06 }} whileHover={{ y: -6 }} className="rounded-[8px] border border-white/12 bg-white/[0.06] p-6 backdrop-blur-xl">
-              <div className="grid h-12 w-12 place-items-center rounded-full bg-cyan/14 text-cyan">
-                <Icon size={23} />
+    <section id="diferenciais" className="bg-white py-16">
+      <div className="container-shell grid gap-10 lg:grid-cols-[0.42fr_1fr]">
+        <SectionIntro eyebrow="Por que escolher a VitaFarma?" title="Confiança que você sente, cuidado que você merece." text="Uma experiência desenhada para unir agilidade, segurança, atendimento humano e produtos originais." />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {differentials.slice(0, 5).map(([title, text, Icon], index) => (
+            <motion.div key={title} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ delay: index * 0.05 }} whileHover={{ y: -6 }} className="rounded-[8px] border border-slate-200 bg-white p-5 text-center shadow-[0_18px_45px_rgba(6,23,47,0.06)]">
+              <div className="mx-auto grid h-12 w-12 place-items-center rounded-[8px] bg-royal/10 text-royal">
+                <Icon size={22} />
               </div>
-              <h3 className="mt-5 font-display text-xl font-bold">{title}</h3>
-              <p className="mt-3 text-sm leading-6 text-white/66">{text}</p>
+              <h3 className="mt-4 font-display text-sm font-extrabold text-midnight">{title}</h3>
+              <p className="mt-2 text-xs leading-5 text-slate-500">{text}</p>
             </motion.div>
           ))}
         </div>
@@ -519,18 +650,15 @@ function Differentials() {
   );
 }
 
-function HowItWorks() {
-  const steps = ["Escolha o produto.", "Chame no WhatsApp.", "Nossa equipe confirma.", "Receba seu pedido."];
+function Brands() {
   return (
-    <section className="bg-white py-24">
+    <section className="border-y border-slate-200 bg-white py-10">
       <div className="container-shell">
-        <SectionIntro eyebrow="Como funciona" title="Pedido simples, rápido e acompanhado pela equipe." text="O fluxo foi pensado para reduzir atrito e acelerar sua compra com atendimento humanizado." align="center" />
-        <div className="mt-14 grid gap-4 lg:grid-cols-4">
-          {steps.map((step, index) => (
-            <motion.div key={step} initial={{ opacity: 0, x: index % 2 === 0 ? -32 : 32 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.08 }} className="relative rounded-[8px] border border-slate-200 bg-ice p-6">
-              <span className="grid h-12 w-12 place-items-center rounded-full bg-royal font-display text-xl font-extrabold text-white">{index + 1}</span>
-              <h3 className="mt-8 font-display text-xl font-bold text-midnight">{step}</h3>
-              {index < steps.length - 1 ? <ArrowRight className="absolute right-6 top-8 hidden text-cyan lg:block" /> : null}
+        <span className="font-display text-xs font-extrabold uppercase tracking-[0.16em] text-royal">Marcas que você confia</span>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8">
+          {brandLogos.map((brand, index) => (
+            <motion.div key={brand} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.04 }} className="grid h-14 place-items-center rounded-[8px] bg-ice px-4 font-display text-lg font-extrabold text-royal shadow-sm">
+              {brand}
             </motion.div>
           ))}
         </div>
@@ -539,27 +667,7 @@ function HowItWorks() {
   );
 }
 
-function Stats() {
-  return (
-    <section className="bg-midnight py-20">
-      <div className="container-shell grid gap-10 md:grid-cols-4">
-        <Counter value={8000} label="Clientes" />
-        <Counter value={3500} label="Entregas" />
-        <Counter value={1500} label="Produtos" />
-        <div className="text-center">
-          <div className="flex justify-center gap-1 text-cyan">
-            {Array.from({ length: 5 }).map((_, index) => (
-              <Star key={index} size={30} fill="currentColor" />
-            ))}
-          </div>
-          <span className="mt-3 block text-sm font-semibold uppercase tracking-[0.18em] text-white/68">Avaliação</span>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Testimonials() {
+function PharmacyHub() {
   const [active, setActive] = useState(0);
 
   useEffect(() => {
@@ -570,25 +678,71 @@ function Testimonials() {
   const testimonial = testimonials[active];
 
   return (
-    <section className="bg-ice py-24">
-      <div className="container-shell grid items-center gap-10 lg:grid-cols-[0.85fr_1.15fr]">
-        <SectionIntro eyebrow="Depoimentos" title="Quem compra uma vez entende o valor do atendimento." text="Avaliações inspiradas no cuidado, na rapidez e na confiança que a VitaFarma Antas deseja entregar todos os dias." />
-        <motion.article key={testimonial.name} initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.45 }} className="rounded-[8px] bg-white p-7 shadow-lift">
-          <div className="flex items-center gap-4">
-            <Image src={testimonial.image} alt={testimonial.name} width={74} height={74} className="h-[74px] w-[74px] rounded-full object-cover" />
-            <div>
-              <strong className="font-display text-xl">{testimonial.name}</strong>
-              <div className="mt-2 flex gap-1 text-signal">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <Star key={index} size={17} fill="currentColor" />
-                ))}
+    <section className="bg-ice py-16">
+      <div className="container-shell grid gap-5 lg:grid-cols-4">
+        <motion.article variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="rounded-[8px] border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(6,23,47,0.06)]">
+          <h3 className="font-display text-sm font-extrabold uppercase tracking-[0.12em] text-royal">Serviços farmacêuticos</h3>
+          <div className="mt-5 grid gap-3">
+            {pharmacyServices.map(([label, Icon]) => (
+              <div key={label} className="flex items-center gap-3 text-sm font-semibold text-midnight">
+                <Icon size={18} className="text-royal" />
+                {label}
               </div>
+            ))}
+          </div>
+          <a href={whatsappLink("Olá, VitaFarma! Quero saber mais sobre serviços farmacêuticos.")} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex rounded-full border border-royal px-5 py-2 text-xs font-extrabold text-royal">
+            Saiba mais
+          </a>
+        </motion.article>
+
+        <motion.article variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="rounded-[8px] border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(6,23,47,0.06)]">
+          <h3 className="font-display text-sm font-extrabold uppercase tracking-[0.12em] text-royal">Convênios</h3>
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            {convenioItems.map((item) => (
+              <div key={item} className="grid min-h-16 place-items-center rounded-[8px] border border-slate-200 bg-ice px-3 text-center text-sm font-extrabold text-midnight">
+                {item}
+              </div>
+            ))}
+          </div>
+          <a href={whatsappLink("Olá, VitaFarma! Quero consultar convênios aceitos.")} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex rounded-full border border-royal px-5 py-2 text-xs font-extrabold text-royal">
+            Ver todos convênios
+          </a>
+        </motion.article>
+
+        <motion.article key={testimonial.name} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="rounded-[8px] border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(6,23,47,0.06)]">
+          <h3 className="font-display text-sm font-extrabold uppercase tracking-[0.12em] text-royal">Depoimentos</h3>
+          <Quote className="mt-5 text-royal" size={28} />
+          <p className="mt-3 text-sm font-semibold leading-6 text-midnight">{testimonial.text}</p>
+          <div className="mt-4 flex gap-1 text-signal">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <Star key={index} size={16} fill="currentColor" />
+            ))}
+          </div>
+          <div className="mt-5 flex items-center gap-3">
+            <Image src={testimonial.image} alt={testimonial.name} width={42} height={42} className="h-11 w-11 rounded-full object-cover" />
+            <div>
+              <strong className="block text-sm font-extrabold text-midnight">{testimonial.name}</strong>
+              <span className="text-xs text-slate-500">Cliente VitaFarma</span>
             </div>
           </div>
-          <p className="mt-7 text-2xl font-semibold leading-relaxed text-midnight">“{testimonial.text}”</p>
-          <div className="mt-6 flex gap-2">
+          <div className="mt-4 flex gap-2">
             {testimonials.map((item, index) => (
-              <button key={item.name} type="button" aria-label={`Ver depoimento ${index + 1}`} onClick={() => setActive(index)} className={`h-2.5 rounded-full transition-all ${active === index ? "w-10 bg-royal" : "w-2.5 bg-slate-300"}`} />
+              <button key={item.name} type="button" aria-label={`Ver depoimento ${index + 1}`} onClick={() => setActive(index)} className={`h-2 rounded-full transition-all ${active === index ? "w-8 bg-royal" : "w-2 bg-slate-300"}`} />
+            ))}
+          </div>
+        </motion.article>
+
+        <motion.article variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="rounded-[8px] border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(6,23,47,0.06)]">
+          <h3 className="font-display text-sm font-extrabold uppercase tracking-[0.12em] text-royal">Dicas de saúde</h3>
+          <div className="mt-5 grid gap-4">
+            {healthTips.map((tip) => (
+              <a key={tip.title} href="#contato" className="grid grid-cols-[76px_1fr] gap-3">
+                <Image src={tip.image} alt={tip.title} width={76} height={58} className="h-16 w-[76px] rounded-[8px] object-cover" />
+                <span className="text-sm font-bold leading-5 text-midnight">
+                  {tip.title}
+                  <small className="mt-1 block font-extrabold text-royal">Ler mais</small>
+                </span>
+              </a>
             ))}
           </div>
         </motion.article>
@@ -599,11 +753,11 @@ function Testimonials() {
 
 function Contact() {
   return (
-    <section id="contato" className="bg-white py-24">
-      <div className="container-shell grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-        <div>
-          <SectionIntro eyebrow="Contato" title="Estamos na Rua da Feira, em Antas." text="Chame pelo WhatsApp, acompanhe no Instagram ou abra o mapa para chegar com facilidade." />
-          <div className="mt-8 grid gap-3">
+    <section id="contato" className="bg-white py-16">
+      <div className="container-shell grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+        <motion.div initial={{ opacity: 0, x: -28 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="rounded-[8px] border border-slate-200 bg-ice p-7">
+          <SectionIntro eyebrow="Localização" title="Estamos na Rua da Feira, em Antas." text="Chame pelo WhatsApp, acompanhe no Instagram ou abra o mapa para chegar com facilidade." />
+          <div className="mt-7 grid gap-3">
             {[
               [MessageCircle, "WhatsApp", "Atendimento e pedidos online"],
               [Instagram, "Instagram", site.instagramHandle],
@@ -612,8 +766,8 @@ function Contact() {
             ].map(([Icon, title, text]) => {
               const TypedIcon = Icon as LucideIcon;
               return (
-                <div key={String(title)} className="flex items-center gap-4 rounded-[8px] border border-slate-200 bg-ice p-4">
-                  <span className="grid h-11 w-11 place-items-center rounded-full bg-white text-royal">
+                <div key={String(title)} className="flex items-center gap-4 rounded-[8px] border border-slate-200 bg-white p-4">
+                  <span className="grid h-11 w-11 place-items-center rounded-[8px] bg-royal/10 text-royal">
                     <TypedIcon size={21} />
                   </span>
                   <div>
@@ -634,8 +788,8 @@ function Contact() {
               Como chegar
             </a>
           </div>
-        </div>
-        <motion.div initial={{ opacity: 0, x: 42 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="min-h-[440px] overflow-hidden rounded-[8px] shadow-glow">
+        </motion.div>
+        <motion.div initial={{ opacity: 0, x: 42 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="min-h-[460px] overflow-hidden rounded-[8px] border border-slate-200 shadow-[0_22px_55px_rgba(6,23,47,0.12)]">
           <iframe title="Mapa da VitaFarma Antas" src={site.mapsEmbed} loading="lazy" className="h-full min-h-[440px] w-full border-0" referrerPolicy="no-referrer-when-downgrade" />
         </motion.div>
       </div>
@@ -661,24 +815,49 @@ function CTA() {
 
 function Footer() {
   return (
-    <footer className="bg-white py-10">
-      <div className="container-shell flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
+    <footer className="bg-midnight pt-12 text-white">
+      <div className="container-shell grid gap-8 pb-10 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1.35fr]">
         <div>
-          <Image src="/logo-vitafarma.png" alt="VitaFarma Antas" width={150} height={78} className="h-auto w-36" />
-          <p className="mt-3 text-sm text-slate-500">© {new Date().getFullYear()} VitaFarma Antas. Todos os direitos reservados.</p>
+          <Image src="/logo-vitafarma.png" alt="VitaFarma Antas" width={170} height={90} className="h-auto w-40 brightness-0 invert" />
+          <p className="mt-5 text-sm leading-6 text-white/70">Mais saúde, cuidado e praticidade para você e sua família todos os dias. Estamos sempre prontos para atender com excelência.</p>
+          <div className="mt-5 flex gap-3 text-white">
+            <Instagram size={18} />
+            <MessageCircle size={19} />
+          </div>
         </div>
-        <div className="flex flex-wrap gap-4 text-sm font-bold text-midnight">
-          {nav.slice(1).map(([label, href]) => (
-            <a key={label} href={href} className="hover:text-royal">
-              {label}
-            </a>
-          ))}
-          <a href={site.instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-royal">
-            Instagram
-          </a>
-          <a href={site.mapsUrl} target="_blank" rel="noopener noreferrer" className="hover:text-royal">
-            Mapa
-          </a>
+        <div>
+          <h3 className="font-display text-sm font-extrabold uppercase tracking-[0.12em]">Contato</h3>
+          <div className="mt-5 grid gap-3 text-sm text-white/72">
+            <span className="flex items-center gap-2"><Phone size={16} /> (75) 9 9999-9999</span>
+            <span className="flex items-center gap-2"><MessageCircle size={16} /> (75) 3439-9999</span>
+            <span className="flex items-center gap-2"><Mail size={16} /> contato@vitafarma.com.br</span>
+            <span className="flex items-center gap-2"><MapPin size={16} /> Antas - Bahia</span>
+          </div>
+        </div>
+        <div>
+          <h3 className="font-display text-sm font-extrabold uppercase tracking-[0.12em]">Informações</h3>
+          <div className="mt-5 grid gap-3 text-sm text-white/72">
+            {nav.slice(1).map(([label, href]) => (
+              <a key={label} href={href} className="hover:text-white">- {label}</a>
+            ))}
+          </div>
+        </div>
+        <div>
+          <h3 className="font-display text-sm font-extrabold uppercase tracking-[0.12em]">Atendimento</h3>
+          <div className="mt-5 grid gap-3 text-sm text-white/72">
+            <span>Segunda a Sábado: 07h às 21h</span>
+            <span>Domingos e feriados: 08h às 14h</span>
+            <span className="flex items-center gap-2 text-white"><HeartHandshake size={17} /> Entrega rápida para Antas e região</span>
+          </div>
+        </div>
+        <div className="min-h-40 overflow-hidden rounded-[8px] border border-white/12">
+          <iframe title="Mapa VitaFarma rodapé" src={site.mapsEmbed} loading="lazy" className="h-full min-h-40 w-full border-0 grayscale" referrerPolicy="no-referrer-when-downgrade" />
+        </div>
+      </div>
+      <div className="border-t border-white/10 py-4">
+        <div className="container-shell flex flex-col gap-2 text-xs text-white/64 md:flex-row md:items-center md:justify-between">
+          <span>© {new Date().getFullYear()} VitaFarma. Todos os direitos reservados.</span>
+          <span>Desenvolvido para uma experiência premium.</span>
         </div>
       </div>
     </footer>
@@ -732,14 +911,11 @@ export function HomePage() {
       <main>
         <Hero />
         <BenefitsBar />
-        <About />
         <Products />
         <Offers />
         <Differentials />
-        <HowItWorks />
-        <Stats />
-        <Testimonials />
-        <CTA />
+        <Brands />
+        <PharmacyHub />
         <Contact />
       </main>
       <Footer />

@@ -13,6 +13,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -20,6 +21,7 @@ body {
   background: #f5f9fc;
   color: #06172f;
   cursor: none;
+  overflow-x: hidden;
 }
 
 a {
@@ -81,6 +83,13 @@ a {
 @media (pointer: coarse) {
   body {
     cursor: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .container-shell {
+    width: calc(100vw - 32px);
+    max-width: calc(100vw - 32px);
   }
 }
 
