@@ -1,6 +1,6 @@
 export const campanhaAnual = {
   active: true,
-  title: "Grande Sorteio Anual Vita Pharma",
+  title: "Grande Sorteio Anual Vita Farma",
   description:
     "A cada R$ 40,00 em compras você recebe 1 cupom para concorrer a prêmios incríveis.",
   highlight:

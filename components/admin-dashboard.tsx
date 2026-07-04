@@ -966,7 +966,45 @@ function OrdersSection({ orders, customers, draft, setDraft, save, remove, savin
 function CampaignSection({ campaign, setCampaign, save, uploadBanner, saving }: { campaign: CampaignConfig; setCampaign: React.Dispatch<React.SetStateAction<CampaignConfig>>; save: () => void; uploadBanner: (file: File) => void; saving: boolean }) {
   const end = new Date(campaign.endDate).getTime();
   const days = Math.max(0, Math.ceil((end - Date.now()) / 86400000));
-  return <section className="rounded-[8px] border border-slate-200 bg-white p-5 shadow-[0_16px_34px_rgba(6,23,47,0.055)]"><div className="flex items-center justify-between"><h2 className="font-display text-xl font-extrabold">Campanha Anual</h2><span className="rounded-full bg-royal/10 px-3 py-1 text-xs font-extrabold text-royal">{days} dias restantes</span></div><div className="mt-5 grid gap-3 md:grid-cols-2"><input value={campaign.title} onChange={(e) => setCampaign({ ...campaign, title: e.target.value })} placeholder="Titulo" className="h-11 rounded-[8px] border border-slate-200 px-3 text-sm font-semibold" /><input type="datetime-local" value={campaign.endDate.slice(0, 16)} onChange={(e) => setCampaign({ ...campaign, endDate: new Date(e.target.value).toISOString() })} className="h-11 rounded-[8px] border border-slate-200 px-3 text-sm font-semibold" /><input value={campaign.bannerUrl} onChange={(e) => setCampaign({ ...campaign, bannerUrl: e.target.value })} placeholder="Banner URL" className="h-11 rounded-[8px] border border-slate-200 px-3 text-sm font-semibold" /><label className="flex h-11 cursor-pointer items-center justify-center gap-2 rounded-[8px] border border-dashed border-royal px-4 text-sm font-extrabold text-royal"><Upload size={17} />Upload banner<input type="file" accept="image/*" className="hidden" onChange={(event) => { const file = event.target.files?.[0]; if (file) uploadBanner(file); }} /></label><textarea value={campaign.description} onChange={(e) => setCampaign({ ...campaign, description: e.target.value })} placeholder="Descricao" className="rounded-[8px] border border-slate-200 px-3 py-3 text-sm font-semibold md:col-span-2" /><textarea value={campaign.prizes} onChange={(e) => setCampaign({ ...campaign, prizes: e.target.value })} placeholder="Premios, um por linha" className="rounded-[8px] border border-slate-200 px-3 py-3 text-sm font-semibold" /><textarea value={campaign.rules} onChange={(e) => setCampaign({ ...campaign, rules: e.target.value })} placeholder="Regulamento" className="rounded-[8px] border border-slate-200 px-3 py-3 text-sm font-semibold" /></div><button onClick={save} disabled={saving} className="shine mt-5 min-h-11 rounded-[8px] bg-signal px-6 text-sm font-extrabold text-white disabled:opacity-60">{saving ? "Salvando..." : "Salvar campanha"}</button></section>;
+  const previewUrl = campaign.bannerUrl || "/campanha-anual-sorteio.png";
+
+  return (
+    <section className="overflow-hidden rounded-[18px] border border-slate-200 bg-white shadow-[0_24px_60px_rgba(6,23,47,0.09)]">
+      <div className="grid gap-0 xl:grid-cols-[minmax(0,0.95fr)_minmax(420px,1.05fr)]">
+        <div className="relative min-h-[320px] overflow-hidden bg-midnight xl:min-h-full">
+          <Image src={previewUrl} alt="Preview da campanha anual" fill sizes="(max-width: 1280px) 100vw, 44vw" className="object-cover object-center" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_54%,rgba(6,23,47,0.62))]" />
+          <div className="absolute left-5 top-5 rounded-full bg-white px-4 py-2 text-xs font-extrabold uppercase text-royal shadow-[0_12px_28px_rgba(6,23,47,0.18)]">Campanha Anual</div>
+          <div className="absolute bottom-5 left-5 right-5">
+            <h2 className="font-display text-2xl font-extrabold leading-tight text-white md:text-3xl">{campaign.title || "Grande Sorteio Anual Vita Farma"}</h2>
+            <span className="mt-3 inline-flex rounded-full bg-signal px-4 py-2 text-xs font-extrabold uppercase text-white shadow-[0_14px_30px_rgba(229,47,63,0.26)]">{days} dias restantes</span>
+          </div>
+        </div>
+
+        <div className="p-5 md:p-7">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h2 className="font-display text-2xl font-extrabold text-midnight">Campanha Anual</h2>
+              <p className="mt-1 text-sm font-semibold text-slate-500">Configure o banner, chamada e detalhes do sorteio.</p>
+            </div>
+            <span className="w-fit rounded-full bg-royal/10 px-3 py-1 text-xs font-extrabold text-royal">{days} dias restantes</span>
+          </div>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <input value={campaign.title} onChange={(e) => setCampaign({ ...campaign, title: e.target.value })} placeholder="Titulo" className="h-12 rounded-[12px] border border-slate-200 px-4 text-sm font-semibold outline-none transition focus:border-royal focus:shadow-[0_0_0_3px_rgba(21,88,214,0.12)]" />
+            <input type="datetime-local" value={campaign.endDate.slice(0, 16)} onChange={(e) => setCampaign({ ...campaign, endDate: new Date(e.target.value).toISOString() })} className="h-12 rounded-[12px] border border-slate-200 px-4 text-sm font-semibold outline-none transition focus:border-royal focus:shadow-[0_0_0_3px_rgba(21,88,214,0.12)]" />
+            <input value={campaign.bannerUrl} onChange={(e) => setCampaign({ ...campaign, bannerUrl: e.target.value })} placeholder="Banner URL" className="h-12 rounded-[12px] border border-slate-200 px-4 text-sm font-semibold outline-none transition focus:border-royal focus:shadow-[0_0_0_3px_rgba(21,88,214,0.12)]" />
+            <label className="flex h-12 cursor-pointer items-center justify-center gap-2 rounded-[12px] border border-dashed border-royal bg-royal/5 px-4 text-sm font-extrabold text-royal transition hover:bg-royal hover:text-white"><Upload size={17} />Upload banner<input type="file" accept="image/*" className="hidden" onChange={(event) => { const file = event.target.files?.[0]; if (file) uploadBanner(file); }} /></label>
+            <textarea value={campaign.description} onChange={(e) => setCampaign({ ...campaign, description: e.target.value })} placeholder="Descricao" className="min-h-24 rounded-[12px] border border-slate-200 px-4 py-3 text-sm font-semibold outline-none transition focus:border-royal focus:shadow-[0_0_0_3px_rgba(21,88,214,0.12)] md:col-span-2" />
+            <textarea value={campaign.prizes} onChange={(e) => setCampaign({ ...campaign, prizes: e.target.value })} placeholder="Premios, um por linha" className="min-h-32 rounded-[12px] border border-slate-200 px-4 py-3 text-sm font-semibold outline-none transition focus:border-royal focus:shadow-[0_0_0_3px_rgba(21,88,214,0.12)]" />
+            <textarea value={campaign.rules} onChange={(e) => setCampaign({ ...campaign, rules: e.target.value })} placeholder="Regulamento" className="min-h-32 rounded-[12px] border border-slate-200 px-4 py-3 text-sm font-semibold outline-none transition focus:border-royal focus:shadow-[0_0_0_3px_rgba(21,88,214,0.12)]" />
+          </div>
+
+          <button onClick={save} disabled={saving} className="shine mt-6 min-h-12 rounded-[14px] bg-signal px-7 text-sm font-extrabold text-white shadow-[0_18px_34px_rgba(229,47,63,0.24)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_42px_rgba(229,47,63,0.3)] disabled:opacity-60">{saving ? "Salvando..." : "Salvar campanha"}</button>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 function WhatsAppAutomationSection() {

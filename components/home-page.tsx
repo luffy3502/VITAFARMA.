@@ -1293,19 +1293,19 @@ function AnnualCampaignPremium({ campaign }: { campaign: CampaignConfig }) {
           viewport={{ once: true, margin: "-80px" }}
           whileHover={{ scale: 1.01 }}
           transition={{ type: "spring", stiffness: 180, damping: 22 }}
-          className="relative overflow-hidden rounded-[8px] border border-white bg-white shadow-[0_26px_70px_rgba(6,23,47,0.16)]"
+          className="relative overflow-hidden rounded-[18px] border border-white bg-white shadow-[0_30px_80px_rgba(6,23,47,0.18)]"
         >
           <div className="absolute inset-x-0 top-0 z-10 h-1 bg-[linear-gradient(90deg,#1558d6,#ffffff,#e52f3f)]" />
-          <div className="grid gap-0 lg:grid-cols-[1fr_330px]">
-            <div className="relative overflow-hidden bg-midnight">
-              <div className="campaign-banner-zoom relative aspect-[16/10] min-h-[300px] sm:aspect-[16/8] lg:min-h-[560px]">
+          <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_360px]">
+            <div className="relative overflow-hidden bg-white">
+              <div className="campaign-banner-zoom relative aspect-[1480/1065] min-h-[280px] sm:min-h-[420px] lg:h-full lg:min-h-[620px]">
                 <Image
                   src="/campanha-anual-sorteio.png"
                   alt="Banner do Grande Sorteio Anual VitaFarma"
                   fill
                   priority
                   sizes="(max-width: 1024px) 100vw, 850px"
-                  className="object-cover"
+                  className="object-cover object-center"
                 />
               </div>
               <div className="campaign-banner-shine absolute inset-0" />
@@ -1317,29 +1317,22 @@ function AnnualCampaignPremium({ campaign }: { campaign: CampaignConfig }) {
                 <span className="campaign-flash left-[52%] top-[38%] delay-700" />
                 <span className="campaign-flash left-[84%] top-[18%] delay-1000" />
               </div>
-              <div className="absolute inset-x-0 bottom-0 bg-[linear-gradient(180deg,transparent,rgba(6,23,47,0.78))] p-4 sm:p-6 lg:hidden">
-                <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-xs font-extrabold uppercase text-royal">
-                  <Gift size={15} />
-                  Campanha anual
-                </span>
-                <h2 className="mt-3 max-w-[720px] font-display text-2xl font-extrabold leading-tight text-white sm:text-4xl">{campaign.title}</h2>
-              </div>
             </div>
 
-            <aside className="bg-white p-5 text-midnight sm:p-6 lg:p-7">
-              <span className="hidden items-center gap-2 rounded-full bg-royal px-4 py-2 text-xs font-extrabold uppercase text-white lg:inline-flex">
+            <aside className="bg-white p-5 text-midnight sm:p-7 lg:p-8">
+              <span className="inline-flex items-center gap-2 rounded-full bg-royal px-4 py-2 text-xs font-extrabold uppercase text-white shadow-[0_12px_26px_rgba(21,88,214,0.18)]">
                 <Gift size={16} />
                 Campanha anual
               </span>
-              <h2 className="mt-4 hidden font-display text-3xl font-extrabold leading-tight text-midnight lg:block">{campaign.title}</h2>
-              <p className="mt-3 text-sm font-bold leading-6 text-royal">{campaign.description}</p>
-              <p className="mt-2 text-sm leading-6 text-slate-600">{campaign.highlight}</p>
+              <h2 className="mt-5 font-display text-3xl font-extrabold leading-tight text-midnight lg:text-[2.15rem]">{campaign.title}</h2>
+              <p className="mt-4 text-base font-extrabold leading-7 text-royal">{campaign.description}</p>
+              <p className="mt-3 text-sm leading-6 text-slate-600">{campaign.highlight}</p>
 
-              <div className="mt-5 rounded-[8px] border border-slate-200 bg-ice p-4">
+              <div className="mt-6 rounded-[18px] border border-slate-200 bg-ice p-4 shadow-inner">
                 <span className="text-xs font-extrabold uppercase text-slate-500">Sorteio em</span>
                 <div className="mt-3 grid grid-cols-4 gap-2">
                   {countdown.map(([label, value]) => (
-                    <div key={label} className="rounded-[8px] bg-white px-2 py-3 text-center shadow-sm">
+                    <div key={label} className="rounded-[12px] bg-white px-2 py-3 text-center shadow-sm">
                       <strong className="font-display text-xl font-extrabold text-royal sm:text-2xl">{String(value).padStart(2, "0")}</strong>
                       <span className="mt-1 block text-[0.62rem] font-extrabold uppercase text-slate-500">{label}</span>
                     </div>
@@ -1347,10 +1340,10 @@ function AnnualCampaignPremium({ campaign }: { campaign: CampaignConfig }) {
                 </div>
               </div>
 
-              <div className="mt-5 grid gap-3">
+              <div className="mt-6 grid gap-3">
                 {campaignSteps.map(([label, Icon]) => (
-                  <div key={label} className="flex items-center gap-3 rounded-[8px] border border-slate-100 bg-white px-3 py-2 shadow-sm">
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[8px] bg-royal text-white">
+                  <div key={label} className="flex items-center gap-3 rounded-[14px] border border-slate-100 bg-white px-3 py-3 shadow-sm">
+                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-royal text-white">
                       <Icon size={18} />
                     </span>
                     <strong className="text-sm font-extrabold text-slate-700">{label}</strong>
@@ -1362,7 +1355,7 @@ function AnnualCampaignPremium({ campaign }: { campaign: CampaignConfig }) {
                 href={whatsappLink(campaign.buttonMessage)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="shine mt-6 flex min-h-14 items-center justify-center gap-3 rounded-[8px] bg-signal px-5 py-4 text-center text-sm font-extrabold text-white shadow-[0_18px_34px_rgba(229,47,63,0.28)] transition hover:-translate-y-1 sm:text-base"
+                className="shine mt-7 flex min-h-14 items-center justify-center gap-3 rounded-[14px] bg-signal px-5 py-4 text-center text-sm font-extrabold text-white shadow-[0_18px_34px_rgba(229,47,63,0.28)] transition hover:-translate-y-1 hover:shadow-[0_24px_42px_rgba(229,47,63,0.34)] sm:text-base"
               >
                 <MessageCircle size={21} />
                 Participar pelo WhatsApp

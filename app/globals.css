@@ -125,7 +125,7 @@ section {
 }
 
 .campaign-banner-zoom img {
-  animation: campaign-zoom 9s ease-in-out infinite;
+  animation: campaign-zoom 20s ease-in-out infinite;
   will-change: transform;
 }
 
@@ -140,8 +140,8 @@ section {
   inset: -20% auto -20% -45%;
   width: 32%;
   transform: rotate(14deg);
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.52), transparent);
-  animation: campaign-shine 4.8s ease-in-out infinite;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.48), transparent);
+  animation: campaign-shine 6.8s ease-in-out infinite;
 }
 
 .campaign-confetti {
@@ -149,8 +149,8 @@ section {
   width: 8px;
   height: 16px;
   border-radius: 2px;
-  opacity: 0.62;
-  animation: campaign-confetti 5.8s ease-in-out infinite;
+  opacity: 0.5;
+  animation: campaign-confetti 8s ease-in-out infinite;
 }
 
 .campaign-confetti-1 { left: 7%; top: 12%; background: #e52f3f; animation-delay: 0s; }
@@ -173,7 +173,7 @@ section {
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.95);
   box-shadow: 0 0 18px rgba(255, 255, 255, 0.9), 0 0 30px rgba(21, 88, 214, 0.42);
-  animation: campaign-flash 3.8s ease-in-out infinite;
+  animation: campaign-flash 5.6s ease-in-out infinite;
 }
 
 @keyframes campaign-zoom {
@@ -182,7 +182,7 @@ section {
   }
 
   50% {
-    transform: scale(1.035);
+    transform: scale(1.03);
   }
 }
 
