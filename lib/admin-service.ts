@@ -491,7 +491,7 @@ export async function uploadAdminAsset(file: File, folder = "products") {
 
   const fileName = sanitizeFileName(file.name);
   const path = `${folder}/${user.id}/${Date.now()}-${fileName}`;
-  const { error } = await supabase.storage.from("product-images").upload(path, file, {
+  const { error } = await supabase.storage.from("products").upload(path, file, {
     cacheControl: "3600",
     contentType: file.type,
     upsert: false,
@@ -502,7 +502,7 @@ export async function uploadAdminAsset(file: File, folder = "products") {
     throw new Error(storageErrorMessage(error) || "Erro ao enviar imagem para o Supabase Storage.");
   }
 
-  const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+  const { data } = supabase.storage.from("products").getPublicUrl(path);
   return data.publicUrl;
 }
 
