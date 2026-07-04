@@ -1265,6 +1265,117 @@ function AdminPanel({
   );
 }
 
+function AnnualCampaignPremium({ campaign }: { campaign: CampaignConfig }) {
+  const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(campaign.drawDate));
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setTimeLeft(getTimeLeft(campaign.drawDate)), 1000);
+    return () => window.clearInterval(timer);
+  }, [campaign.drawDate]);
+
+  if (!campaign.active) return null;
+
+  const countdown = [
+    ["Dias", timeLeft.days],
+    ["Horas", timeLeft.hours],
+    ["Min", timeLeft.minutes],
+    ["Seg", timeLeft.seconds],
+  ] as const;
+
+  return (
+    <section className="relative overflow-hidden bg-ice py-16 md:py-20">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(21,88,214,0.11),transparent_30%),radial-gradient(circle_at_84%_28%,rgba(229,47,63,0.12),transparent_24%)]" />
+      <div className="container-shell relative">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+          whileHover={{ scale: 1.01 }}
+          transition={{ type: "spring", stiffness: 180, damping: 22 }}
+          className="relative overflow-hidden rounded-[8px] border border-white bg-white shadow-[0_26px_70px_rgba(6,23,47,0.16)]"
+        >
+          <div className="absolute inset-x-0 top-0 z-10 h-1 bg-[linear-gradient(90deg,#1558d6,#ffffff,#e52f3f)]" />
+          <div className="grid gap-0 lg:grid-cols-[1fr_330px]">
+            <div className="relative overflow-hidden bg-midnight">
+              <div className="campaign-banner-zoom relative aspect-[16/10] min-h-[300px] sm:aspect-[16/8] lg:min-h-[560px]">
+                <Image
+                  src="/campanha-anual-sorteio.png"
+                  alt="Banner do Grande Sorteio Anual VitaFarma"
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 850px"
+                  className="object-cover"
+                />
+              </div>
+              <div className="campaign-banner-shine absolute inset-0" />
+              <div className="pointer-events-none absolute inset-0">
+                {Array.from({ length: 12 }).map((_, index) => (
+                  <span key={index} className={`campaign-confetti campaign-confetti-${index + 1}`} />
+                ))}
+                <span className="campaign-flash left-[18%] top-[82%]" />
+                <span className="campaign-flash left-[52%] top-[38%] delay-700" />
+                <span className="campaign-flash left-[84%] top-[18%] delay-1000" />
+              </div>
+              <div className="absolute inset-x-0 bottom-0 bg-[linear-gradient(180deg,transparent,rgba(6,23,47,0.78))] p-4 sm:p-6 lg:hidden">
+                <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-xs font-extrabold uppercase text-royal">
+                  <Gift size={15} />
+                  Campanha anual
+                </span>
+                <h2 className="mt-3 max-w-[720px] font-display text-2xl font-extrabold leading-tight text-white sm:text-4xl">{campaign.title}</h2>
+              </div>
+            </div>
+
+            <aside className="bg-white p-5 text-midnight sm:p-6 lg:p-7">
+              <span className="hidden items-center gap-2 rounded-full bg-royal px-4 py-2 text-xs font-extrabold uppercase text-white lg:inline-flex">
+                <Gift size={16} />
+                Campanha anual
+              </span>
+              <h2 className="mt-4 hidden font-display text-3xl font-extrabold leading-tight text-midnight lg:block">{campaign.title}</h2>
+              <p className="mt-3 text-sm font-bold leading-6 text-royal">{campaign.description}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{campaign.highlight}</p>
+
+              <div className="mt-5 rounded-[8px] border border-slate-200 bg-ice p-4">
+                <span className="text-xs font-extrabold uppercase text-slate-500">Sorteio em</span>
+                <div className="mt-3 grid grid-cols-4 gap-2">
+                  {countdown.map(([label, value]) => (
+                    <div key={label} className="rounded-[8px] bg-white px-2 py-3 text-center shadow-sm">
+                      <strong className="font-display text-xl font-extrabold text-royal sm:text-2xl">{String(value).padStart(2, "0")}</strong>
+                      <span className="mt-1 block text-[0.62rem] font-extrabold uppercase text-slate-500">{label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-5 grid gap-3">
+                {campaignSteps.map(([label, Icon]) => (
+                  <div key={label} className="flex items-center gap-3 rounded-[8px] border border-slate-100 bg-white px-3 py-2 shadow-sm">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[8px] bg-royal text-white">
+                      <Icon size={18} />
+                    </span>
+                    <strong className="text-sm font-extrabold text-slate-700">{label}</strong>
+                  </div>
+                ))}
+              </div>
+
+              <a
+                href={whatsappLink(campaign.buttonMessage)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shine mt-6 flex min-h-14 items-center justify-center gap-3 rounded-[8px] bg-signal px-5 py-4 text-center text-sm font-extrabold text-white shadow-[0_18px_34px_rgba(229,47,63,0.28)] transition hover:-translate-y-1 sm:text-base"
+              >
+                <MessageCircle size={21} />
+                Participar pelo WhatsApp
+                <ChevronRight size={20} />
+              </a>
+            </aside>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
 function AnnualCampaign({ campaign }: { campaign: CampaignConfig }) {
   const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(campaign.drawDate));
 
@@ -1735,7 +1846,7 @@ export function HomePage() {
         <PharmacyCatalog products={products} categories={categories} />
         <Offers products={products} />
         <Differentials />
-        <AnnualCampaign campaign={campaign} />
+        <AnnualCampaignPremium campaign={campaign} />
         <Brands />
         <PharmacyHub />
         <Contact />

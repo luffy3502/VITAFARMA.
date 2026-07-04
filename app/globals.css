@@ -124,6 +124,106 @@ section {
   text-wrap: balance;
 }
 
+.campaign-banner-zoom img {
+  animation: campaign-zoom 9s ease-in-out infinite;
+  will-change: transform;
+}
+
+.campaign-banner-shine {
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.campaign-banner-shine::after {
+  content: "";
+  position: absolute;
+  inset: -20% auto -20% -45%;
+  width: 32%;
+  transform: rotate(14deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.52), transparent);
+  animation: campaign-shine 4.8s ease-in-out infinite;
+}
+
+.campaign-confetti {
+  position: absolute;
+  width: 8px;
+  height: 16px;
+  border-radius: 2px;
+  opacity: 0.62;
+  animation: campaign-confetti 5.8s ease-in-out infinite;
+}
+
+.campaign-confetti-1 { left: 7%; top: 12%; background: #e52f3f; animation-delay: 0s; }
+.campaign-confetti-2 { left: 16%; top: 72%; background: #1558d6; animation-delay: 0.4s; }
+.campaign-confetti-3 { left: 25%; top: 18%; background: #f5c542; animation-delay: 0.9s; }
+.campaign-confetti-4 { left: 34%; top: 84%; background: #ffffff; animation-delay: 1.2s; }
+.campaign-confetti-5 { left: 46%; top: 14%; background: #1558d6; animation-delay: 1.6s; }
+.campaign-confetti-6 { left: 57%; top: 78%; background: #e52f3f; animation-delay: 2s; }
+.campaign-confetti-7 { left: 68%; top: 20%; background: #f5c542; animation-delay: 2.3s; }
+.campaign-confetti-8 { left: 76%; top: 70%; background: #ffffff; animation-delay: 2.7s; }
+.campaign-confetti-9 { left: 86%; top: 15%; background: #1558d6; animation-delay: 3.1s; }
+.campaign-confetti-10 { left: 92%; top: 58%; background: #e52f3f; animation-delay: 3.5s; }
+.campaign-confetti-11 { left: 12%; top: 43%; background: #f5c542; animation-delay: 3.9s; }
+.campaign-confetti-12 { left: 82%; top: 38%; background: #ffffff; animation-delay: 4.3s; }
+
+.campaign-flash {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.9), 0 0 30px rgba(21, 88, 214, 0.42);
+  animation: campaign-flash 3.8s ease-in-out infinite;
+}
+
+@keyframes campaign-zoom {
+  0%, 100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+@keyframes campaign-shine {
+  0%, 36% {
+    left: -45%;
+    opacity: 0;
+  }
+
+  48% {
+    opacity: 1;
+  }
+
+  70%, 100% {
+    left: 120%;
+    opacity: 0;
+  }
+}
+
+@keyframes campaign-confetti {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+
+  50% {
+    transform: translate3d(8px, 14px, 0) rotate(18deg);
+  }
+}
+
+@keyframes campaign-flash {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+
+  45%, 55% {
+    opacity: 0.95;
+    transform: scale(1.35);
+  }
+}
+
 @media (pointer: coarse) {
   body {
     cursor: auto;
