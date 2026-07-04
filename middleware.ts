@@ -1,12 +1,18 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { authStorageKey, readAccessTokenFromStoredSession } from "@/lib/supabase-auth-storage";
+import {
+  authAccessTokenCookieKey,
+  authStorageKey,
+  readAccessTokenFromStoredSession,
+} from "@/lib/supabase-auth-storage";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 async function getAuthenticatedAdmin(request: NextRequest) {
   try {
-    const token = readAccessTokenFromStoredSession(request.cookies.get(authStorageKey)?.value);
+    const token =
+      request.cookies.get(authAccessTokenCookieKey)?.value ??
+      readAccessTokenFromStoredSession(request.cookies.get(authStorageKey)?.value);
     if (!token || !supabaseUrl || !supabaseAnonKey) return { hasSession: false, isAdmin: false };
 
     const authResponse = await fetch(`${supabaseUrl}/auth/v1/user`, {
@@ -43,7 +49,13 @@ async function getAuthenticatedAdmin(request: NextRequest) {
 
     const profiles = await profileResponse.json() as Array<{ access_type?: string | null; status?: string | null }>;
     const profile = profiles[0];
-    const isAdmin = Boolean(profile && profile.status !== "Inativo" && (!profile.access_type || profile.access_type === "Administrador"));
+    const isAdmin = Boolean(
+      profile &&
+        profile.status !== "Inativo" &&
+        profile.status !== "inactive" &&
+        (!profile.access_type ||
+          ["admin", "Administrador"].includes(profile.access_type))
+    );
 
     return { hasSession: true, isAdmin };
   } catch (error) {

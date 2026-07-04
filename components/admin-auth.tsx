@@ -7,7 +7,10 @@ import { ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ensureAdminProfile } from "@/lib/admin-auth";
 import { supabase } from "@/lib/supabase";
-import { authStorageKey } from "@/lib/supabase-auth-storage";
+import {
+  authAccessTokenCookieKey,
+  authStorageKey,
+} from "@/lib/supabase-auth-storage";
 
 function withTimeout<T>(promise: Promise<T>, message: string, timeoutMs = 9000) {
   return new Promise<T>((resolve, reject) => {
@@ -17,6 +20,30 @@ function withTimeout<T>(promise: Promise<T>, message: string, timeoutMs = 9000) 
       .catch((error) => reject(error))
       .finally(() => window.clearTimeout(timeout));
   });
+}
+
+function adminLoginErrorMessage(error: unknown) {
+  const message = error instanceof Error ? error.message : "";
+  const normalized = message.toLowerCase();
+
+  if (
+    normalized.includes("invalid login credentials") ||
+    normalized.includes("invalid credentials") ||
+    normalized.includes("email not confirmed")
+  ) {
+    return "Usuário ou senha inválidos";
+  }
+
+  if (
+    normalized.includes("perfil administrativo") ||
+    normalized.includes("administradores") ||
+    normalized.includes("administrador") ||
+    normalized.includes("sem perfil")
+  ) {
+    return "Usuário sem permissão de administrador";
+  }
+
+  return message || "Não foi possível autenticar.";
 }
 
 export function AdminAuth() {
@@ -73,6 +100,7 @@ export function AdminAuth() {
       });
       window.localStorage.removeItem(authStorageKey);
       document.cookie = `${authStorageKey}=; Path=/; Max-Age=0; SameSite=Lax`;
+      document.cookie = `${authAccessTokenCookieKey}=; Path=/; Max-Age=0; SameSite=Lax`;
       router.refresh();
       window.location.assign("/admin");
     } catch (clearError) {
@@ -98,8 +126,9 @@ export function AdminAuth() {
       }
 
       router.replace("/admin/dashboard");
+      router.refresh();
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "Nao foi possivel autenticar.");
+      setError(adminLoginErrorMessage(submitError));
     } finally {
       setSubmitting(false);
     }

@@ -1,4 +1,5 @@
 export const authStorageKey = "vitafarma.supabase.auth";
+export const authAccessTokenCookieKey = `${authStorageKey}.access-token`;
 
 const isBrowser = typeof window !== "undefined";
 
@@ -35,11 +36,21 @@ export const authCookieStorage = {
     if (!isBrowser) return;
     window.localStorage.setItem(key, value);
     setCookie(key, value);
+
+    try {
+      const session = JSON.parse(value);
+      if (typeof session?.access_token === "string") {
+        setCookie(authAccessTokenCookieKey, session.access_token);
+      }
+    } catch {
+      deleteCookie(authAccessTokenCookieKey);
+    }
   },
   removeItem(key: string) {
     if (!isBrowser) return;
     window.localStorage.removeItem(key);
     deleteCookie(key);
+    deleteCookie(authAccessTokenCookieKey);
   },
 };
 
