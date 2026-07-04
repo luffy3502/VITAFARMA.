@@ -121,6 +121,18 @@ function toCategoryPayload(category: Category) {
   };
 }
 
+function sanitizeFileName(fileName: string) {
+  const withoutPath = fileName.split(/[/\\]/).pop() ?? "imagem";
+  const normalized = withoutPath
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9.]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return normalized || "imagem.jpg";
+}
+
 export async function fetchCategories() {
   const { data, error } = await supabase.from("categories").select("*").order("name");
   if (error || !data?.length) return demoCategories;
@@ -180,10 +192,19 @@ export async function deleteCategory(id: string) {
 }
 
 export async function uploadProductAsset(file: File) {
-  const extension = file.name.split(".").pop() ?? "jpg";
-  const path = `products/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!userData.user) throw new Error("Usuario nao autenticado.");
+
+  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error("Formato invalido. Envie uma imagem JPG, JPEG, PNG ou WEBP.");
+  }
+
+  const path = `products/${userData.user.id}/${Date.now()}-${sanitizeFileName(file.name)}`;
   const { error } = await supabase.storage.from("product-images").upload(path, file, {
     cacheControl: "3600",
+    contentType: file.type,
     upsert: false,
   });
 

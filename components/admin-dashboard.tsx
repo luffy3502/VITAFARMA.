@@ -33,7 +33,7 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { formatCurrency, type Category, type Product } from "@/data/catalogo";
 import {
   type Brand,
@@ -234,6 +234,10 @@ export function AdminDashboard() {
   const [offerFilter, setOfferFilter] = useState("Todos");
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Product>(() => emptyProduct());
+  const [imageUploadError, setImageUploadError] = useState("");
+  const [mainImagePreviewUrl, setMainImagePreviewUrl] = useState("");
+  const [uploadingMainImage, setUploadingMainImage] = useState(false);
+  const [uploadingGalleryImages, setUploadingGalleryImages] = useState(false);
   const [categoryDraft, setCategoryDraft] = useState<Partial<Category> & { name: string }>({ name: "", icon: "Pill", isActive: true, displayOrder: 0 });
   const [brandDraft, setBrandDraft] = useState<Partial<Brand> & { name: string }>({ name: "", isActive: true });
   const [customerDraft, setCustomerDraft] = useState<Customer>(blankCustomer);
@@ -244,11 +248,20 @@ export function AdminDashboard() {
     setToast(nextToast);
     window.setTimeout(() => setToast(null), 3600);
   };
+  const previewObjectUrl = useRef<string | null>(null);
 
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get("tab") === "usuarios") {
       setActiveSection("users");
     }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (previewObjectUrl.current) {
+        URL.revokeObjectURL(previewObjectUrl.current);
+      }
+    };
   }, []);
 
   async function loadAll() {
@@ -368,11 +381,15 @@ export function AdminDashboard() {
   }
 
   function openNewProduct() {
+    setImageUploadError("");
+    setMainImagePreviewUrl("");
     setEditing(emptyProduct(categories[0]));
     setModalOpen(true);
   }
 
   function openEditProduct(product: Product) {
+    setImageUploadError("");
+    setMainImagePreviewUrl("");
     setEditing(product);
     setModalOpen(true);
   }
@@ -420,22 +437,51 @@ export function AdminDashboard() {
 
   async function uploadMainImage(file?: File) {
     if (!file) return;
-    await runAction("upload-main", async () => {
+    if (previewObjectUrl.current) {
+      URL.revokeObjectURL(previewObjectUrl.current);
+    }
+
+    previewObjectUrl.current = URL.createObjectURL(file);
+    setMainImagePreviewUrl(previewObjectUrl.current);
+    setImageUploadError("");
+    setUploadingMainImage(true);
+
+    try {
       const url = await uploadAdminAsset(file);
       setEditing((current) => ({ ...current, mainImageUrl: url }));
-    }, "Imagem enviada.");
+      setMainImagePreviewUrl("");
+      showToast({ type: "success", message: "Imagem enviada." });
+    } catch (error) {
+      const message = errorMessage(error);
+      console.error("Erro real do Supabase ao enviar imagem:", error);
+      setImageUploadError(message);
+      showToast({ type: "error", message });
+    } finally {
+      setUploadingMainImage(false);
+    }
   }
 
   async function uploadGallery(files?: FileList | null) {
     if (!files?.length) return;
-    await runAction("upload-gallery", async () => {
+    setImageUploadError("");
+    setUploadingGalleryImages(true);
+
+    try {
       const urls = await Promise.all(Array.from(files).map((file) => uploadAdminAsset(file)));
       setEditing((current) => ({
         ...current,
         galleryImages: [...current.galleryImages, ...urls],
         images: [current.mainImageUrl, ...current.galleryImages, ...urls].filter(Boolean),
       }));
-    }, "Galeria enviada.");
+      showToast({ type: "success", message: "Galeria enviada." });
+    } catch (error) {
+      const message = errorMessage(error);
+      console.error("Erro real do Supabase ao enviar galeria:", error);
+      setImageUploadError(message);
+      showToast({ type: "error", message });
+    } finally {
+      setUploadingGalleryImages(false);
+    }
   }
 
   async function saveCategoryDraft() {
@@ -690,11 +736,19 @@ export function AdminDashboard() {
           setProduct={setEditing}
           categories={categories}
           brands={brands}
-          close={() => setModalOpen(false)}
+          close={() => {
+            setImageUploadError("");
+            setMainImagePreviewUrl("");
+            setModalOpen(false);
+          }}
           save={persistEditing}
-          saving={saving === "product"}
+          saving={saving === "product" || uploadingMainImage || uploadingGalleryImages}
           uploadMainImage={uploadMainImage}
           uploadGallery={uploadGallery}
+          imageUploadError={imageUploadError}
+          mainImagePreviewUrl={mainImagePreviewUrl}
+          uploadingMainImage={uploadingMainImage}
+          uploadingGalleryImages={uploadingGalleryImages}
         />
       ) : null}
     </main>
@@ -944,8 +998,37 @@ function DataRows<T extends { id: string }>({ rows, columns, empty, renderRow, o
   return <div className="mt-5 overflow-x-auto"><table className="w-full min-w-[760px] text-left text-sm"><thead className="text-xs font-extrabold uppercase text-slate-400"><tr>{columns.map((column) => <th key={column} className="px-4 py-3">{column}</th>)}<th>Acoes</th></tr></thead><tbody className="divide-y divide-slate-100">{rows.length ? rows.map((row) => <tr key={row.id} className="hover:bg-ice/70">{renderRow(row).map((cell, index) => <td key={index} className="px-4 py-3 font-semibold">{cell}</td>)}<td><div className="flex gap-2"><button onClick={() => onEdit(row)} className="grid h-9 w-9 place-items-center rounded-[8px] bg-ice text-royal"><Edit3 size={16} /></button><button onClick={() => onDelete(row)} className="grid h-9 w-9 place-items-center rounded-[8px] bg-ice text-signal"><Trash2 size={16} /></button></div></td></tr>) : <tr><td colSpan={columns.length + 1} className="px-4 py-8 text-center font-bold text-slate-400">{empty}</td></tr>}</tbody></table></div>;
 }
 
-function ProductModal({ product, setProduct, categories, brands, close, save, saving, uploadMainImage, uploadGallery }: { product: Product; setProduct: React.Dispatch<React.SetStateAction<Product>>; categories: Category[]; brands: Brand[]; close: () => void; save: () => void; saving: boolean; uploadMainImage: (file?: File) => void; uploadGallery: (files?: FileList | null) => void }) {
+function ProductModal({
+  product,
+  setProduct,
+  categories,
+  brands,
+  close,
+  save,
+  saving,
+  uploadMainImage,
+  uploadGallery,
+  imageUploadError,
+  mainImagePreviewUrl,
+  uploadingMainImage,
+  uploadingGalleryImages,
+}: {
+  product: Product;
+  setProduct: React.Dispatch<React.SetStateAction<Product>>;
+  categories: Category[];
+  brands: Brand[];
+  close: () => void;
+  save: () => void;
+  saving: boolean;
+  uploadMainImage: (file?: File) => void;
+  uploadGallery: (files?: FileList | null) => void;
+  imageUploadError: string;
+  mainImagePreviewUrl: string;
+  uploadingMainImage: boolean;
+  uploadingGalleryImages: boolean;
+}) {
   const selectableCategories = categories.filter((category) => category.isActive || category.id === product.categoryId);
+  const previewUrl = mainImagePreviewUrl || product.mainImageUrl;
 
   return (
     <div className="fixed inset-0 z-[80] overflow-auto bg-midnight/55 p-4 backdrop-blur-sm">
@@ -963,9 +1046,11 @@ function ProductModal({ product, setProduct, categories, brands, close, save, sa
           <input value={product.sku ?? ""} onChange={(event) => setProduct({ ...product, sku: event.target.value })} placeholder="SKU" className="h-12 rounded-[8px] border border-slate-200 px-4 text-sm font-semibold" />
           <input value={product.barcode ?? ""} onChange={(event) => setProduct({ ...product, barcode: event.target.value })} placeholder="Codigo de barras" className="h-12 rounded-[8px] border border-slate-200 px-4 text-sm font-semibold" />
           <input value={product.mainImageUrl} onChange={(event) => setProduct({ ...product, mainImageUrl: event.target.value })} placeholder="Imagem principal URL" className="h-12 rounded-[8px] border border-slate-200 px-4 text-sm font-semibold" />
-          <label className="flex h-12 cursor-pointer items-center justify-center gap-2 rounded-[8px] border border-dashed border-royal px-4 text-sm font-extrabold text-royal"><Upload size={17} />Upload imagem<input type="file" accept="image/*" className="hidden" onChange={(event) => uploadMainImage(event.target.files?.[0])} /></label>
+          <label className={`flex h-12 cursor-pointer items-center justify-center gap-2 rounded-[8px] border border-dashed border-royal px-4 text-sm font-extrabold text-royal ${uploadingMainImage ? "pointer-events-none opacity-70" : ""}`}><Upload size={17} />{uploadingMainImage ? "Enviando imagem..." : "Upload imagem"}<input type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => uploadMainImage(event.target.files?.[0])} /></label>
+          {previewUrl ? <div className="relative min-h-[180px] overflow-hidden rounded-[8px] border border-slate-200 bg-ice md:col-span-2"><Image src={previewUrl} alt={product.name || "Preview do produto"} fill sizes="(max-width: 768px) 100vw, 800px" className="object-contain p-3" /></div> : null}
+          {imageUploadError ? <span className="text-sm font-bold text-signal md:col-span-2">{imageUploadError}</span> : null}
           <textarea value={product.galleryImages.join("\n")} onChange={(event) => setProduct({ ...product, galleryImages: event.target.value.split("\n") })} placeholder="Galeria com multiplas imagens, uma URL por linha" rows={3} className="rounded-[8px] border border-slate-200 px-4 py-3 text-sm font-semibold md:col-span-2" />
-          <label className="flex h-12 cursor-pointer items-center justify-center gap-2 rounded-[8px] border border-dashed border-royal px-4 text-sm font-extrabold text-royal"><Upload size={17} />Upload galeria<input type="file" accept="image/*" multiple className="hidden" onChange={(event) => uploadGallery(event.target.files)} /></label>
+          <label className={`flex h-12 cursor-pointer items-center justify-center gap-2 rounded-[8px] border border-dashed border-royal px-4 text-sm font-extrabold text-royal ${uploadingGalleryImages ? "pointer-events-none opacity-70" : ""}`}><Upload size={17} />{uploadingGalleryImages ? "Enviando galeria..." : "Upload galeria"}<input type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" multiple className="hidden" onChange={(event) => uploadGallery(event.target.files)} /></label>
           <input value={product.videoUrl ?? ""} onChange={(event) => setProduct({ ...product, videoUrl: event.target.value })} placeholder="Video opcional" className="h-12 rounded-[8px] border border-slate-200 px-4 text-sm font-semibold" />
           <input value={(product.tags ?? []).join(", ")} onChange={(event) => setProduct({ ...product, tags: event.target.value.split(",").map((tag) => tag.trim()).filter(Boolean) })} placeholder="Tags" className="h-12 rounded-[8px] border border-slate-200 px-4 text-sm font-semibold" />
           <div className="grid gap-2 md:col-span-2 md:grid-cols-5">{[["Destaque", "isHomeFeatured"], ["Oferta semana", "isWeekOffer"], ["Novo", "isNew"], ["Oferta", "isOffer"], ["Ativo", "isActive"]].map(([label, key]) => <button key={key} onClick={() => setProduct({ ...product, [key]: !product[key as keyof Product] })} className={`min-h-11 rounded-[8px] text-sm font-extrabold ${product[key as keyof Product] ? "bg-royal text-white" : "bg-ice text-midnight"}`}>{label}</button>)}</div>

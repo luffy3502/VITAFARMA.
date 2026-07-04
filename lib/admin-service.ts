@@ -265,6 +265,29 @@ function cleanRecord<T extends Record<string, unknown>>(record: T) {
   return Object.fromEntries(Object.entries(record).filter(([, value]) => value !== undefined)) as Partial<T>;
 }
 
+function storageErrorMessage(error: unknown) {
+  if (error && typeof error === "object") {
+    const payload = error as { message?: unknown; error?: unknown; statusCode?: unknown };
+    return [payload.message, payload.error, payload.statusCode ? `Status: ${payload.statusCode}` : undefined]
+      .filter((item): item is string => typeof item === "string" && Boolean(item.trim()))
+      .join(" | ");
+  }
+
+  return error instanceof Error ? error.message : "Erro desconhecido do Supabase Storage.";
+}
+
+function sanitizeFileName(fileName: string) {
+  const withoutPath = fileName.split(/[/\\]/).pop() ?? "imagem";
+  const normalized = withoutPath
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9.]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return normalized || "imagem.jpg";
+}
+
 async function adminUsersRequest<T>(method = "GET", body?: unknown): Promise<T> {
   const response = await fetch("/api/admin/users", {
     method,
@@ -459,17 +482,24 @@ export async function patchAdminProduct(id: string, patch: Record<string, unknow
 }
 
 export async function uploadAdminAsset(file: File, folder = "products") {
-  await requireAuthenticatedUser();
-  const extension = file.name.split(".").pop() ?? "jpg";
-  const path = `${folder}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+  const user = await requireAuthenticatedUser();
+  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error("Formato invalido. Envie uma imagem JPG, JPEG, PNG ou WEBP.");
+  }
+
+  const fileName = sanitizeFileName(file.name);
+  const path = `${folder}/${user.id}/${Date.now()}-${fileName}`;
   const { error } = await supabase.storage.from("product-images").upload(path, file, {
     cacheControl: "3600",
+    contentType: file.type,
     upsert: false,
   });
 
   if (error) {
     console.error("Erro ao enviar imagem:", error);
-    throw error;
+    throw new Error(storageErrorMessage(error) || "Erro ao enviar imagem para o Supabase Storage.");
   }
 
   const { data } = supabase.storage.from("product-images").getPublicUrl(path);
